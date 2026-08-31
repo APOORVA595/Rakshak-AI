@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="[https://upload.wikimedia.org/wikipedia/commons/4/4b/Kedarnath_Temple_in_monsoon.jpg](https://upload.wikimedia.org/wikipedia/commons/4/4b/Kedarnath_Temple_in_monsoon.jpg)" alt="Kedarnath Temple Banner" width="100%">
+  <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=2000&auto=format&fit=crop" alt="Majestic Himalayas Banner" width="100%">
   
   # 🛡️ Rakshak AI
   **Intelligent Tourist Security & Rapid Response System**
