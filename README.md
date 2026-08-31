@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=2021&auto=format&fit=crop" alt="Travel Safety Banner" width="100%">
+  <img src="http://googleusercontent.com/image_collection/image_retrieval/10295747390395578367" alt="Mountain Rescue & Travel Safety Banner" width="100%">
   
   # 🛡️ Rakshak AI
   **Intelligent Tourist Security & Rapid Response System**
@@ -12,18 +12,18 @@
 ---
 
 ## 🌍 The Impact: Why This Exists
-Tourism connects the world, but traveling in unfamiliar territories often brings safety anxieties. **Rakshak AI** is engineered to eliminate that vulnerability. By fusing real-time location tracking with biometric verification, this system ensures that no traveler is ever unaccounted for during an emergency. 
+Tourism connects the world, drawing millions to breathtaking but historically volatile terrains—from disaster-prone mountain shrines to unpredictable alpine passes. Despite the known risks of natural calamities, the human spirit continues to explore. 
 
-Whether it is a medical crisis where blood type and medical history are needed instantly, or a missing persons scenario requiring rapid facial recognition, Rakshak AI empowers local authorities and families with immediate, life-saving data. It is technology built not just for data management, but for human security and peace of mind.
+**Rakshak AI** is engineered to protect that spirit. By fusing real-time location tracking with biometric verification, this system ensures that no traveler is ever unaccounted for during an emergency. Whether it is a medical crisis where blood type is needed instantly, or a missing persons scenario requiring rapid facial recognition amidst chaos, Rakshak AI empowers local authorities, rescue teams, and families with immediate, life-saving data. It is technology built not just for data management, but for human survival and peace of mind.
 
 ## ✨ Key Features
-*   **Biometric Identity Verification:** Integrates facial recognition vectors to instantly identify and locate tourists in crowded public spaces.
-*   **Real-Time Status Tracking:** Monitors safety statuses (e.g., `SAFE`, `AT_RISK`) alongside critical medical profiles.
-*   **Emergency Infrastructure:** Immediately surfaces emergency contact data and pings relevant authorities the moment a threat is detected.
-*   **RFID Integration (Upcoming):** Seamless checkpoint scanning to maintain accurate area-level headcounts without invasive tracking.
+*   **Biometric Identity Verification:** Integrates facial recognition vectors to instantly identify and locate tourists in crowded or chaotic public spaces.
+*   **Real-Time Status Tracking:** Monitors safety statuses (e.g., `SAFE`, `AT_RISK`) alongside critical medical profiles and emergency contacts.
+*   **Emergency Infrastructure:** Immediately surfaces life-saving data and pings relevant authorities the moment a threat or disaster is detected.
+*   **RFID Integration (Upcoming):** Seamless checkpoint scanning to maintain accurate area-level headcounts without invasive personal tracking.
 
 ## 💻 Technical Architecture
-The system is built on a resilient microservices architecture designed for high availability and rapid data processing.
+The system is built on a resilient microservices architecture designed for high availability and rapid data processing, even under load.
 
 *   **Core Backend:** Java 17, Spring Boot, Spring Data JPA
 *   **Database:** PostgreSQL (Relational mapping for dynamic tourist profiles)
@@ -37,6 +37,7 @@ The system is built on a resilient microservices architecture designed for high 
 *   Maven
 
 ### Local Installation
+
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/APOORVA595/Rakshak-AI.git](https://github.com/APOORVA595/Rakshak-AI.git)
+   git clone https://github.com/APOORVA595/Rakshak-AI.git
