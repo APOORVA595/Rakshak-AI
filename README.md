@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="http://googleusercontent.com/image_collection/image_retrieval/10295747390395578367" alt="Mountain Rescue & Travel Safety Banner" width="100%">
+  <img src="[https://upload.wikimedia.org/wikipedia/commons/4/4b/Kedarnath_Temple_in_monsoon.jpg](https://upload.wikimedia.org/wikipedia/commons/4/4b/Kedarnath_Temple_in_monsoon.jpg)" alt="Kedarnath Temple Banner" width="100%">
   
   # 🛡️ Rakshak AI
   **Intelligent Tourist Security & Rapid Response System**
