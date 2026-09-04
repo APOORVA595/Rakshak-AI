@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rakshak AI - Base Camp Command</title>
+    <!-- Load the Leaflet Map Styles -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #1e1e1e; color: white; margin: 20px; }
+        h2 { color: #ff4757; }
+        /* Make the map big and give it a nice border */
+        #map { height: 600px; width: 100%; border: 3px solid #ff4757; border-radius: 8px; }
+    </style>
+</head>
+<body>
+
+    <h2>🚨 Rakshak AI: Live Rescue Dashboard</h2>
+    <p>Tracking Target: pes1ug23cs095</p>
+    
+    <!-- This empty div is where the map will be injected -->
+    <div id="map"></div>
+
+    <!-- Load the Leaflet Map Engine -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // 1. Initialize the map (Starts roughly focused on the coordinates)
+        var map = L.map('map').setView([12.934, 77.535], 16);
+
+        // 2. Load the actual street map imagery from OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+
+        // 3. Fetch the JSON data from your Java Backend
+        fetch('/api/checkpoints/history/pes1ug23cs095')
+            .then(response => response.json())
+            .then(data => {
+                var coordinatePath = [];
+
+                // 4. Loop through every single ping in the database
+                data.forEach(ping => {
+                    var lat = parseFloat(ping.latitude);
+                    var lon = parseFloat(ping.longitude);
+                    coordinatePath.push([lat, lon]);
+
+                    // Put a pin on the map for each step
+                    var popupText = `
+                        <b>${ping.tourist.fullName}</b><br>
+                        Vitals: ${ping.heartRate}<br>
+                        Blood Type: ${ping.tourist.bloodType}<br>
+                        Status: <span style="color:red;">${ping.tourist.status}</span>
+                    `;
+                    L.marker([lat, lon]).addTo(map).bindPopup(popupText);
+                });
+
+                // 5. Draw a thick red line connecting all the dots (The rescue path)
+                var polyline = L.polyline(coordinatePath, {color: 'red', weight: 5}).addTo(map);
+                
+                // Automatically zoom the map out just enough to fit the entire path on screen
+                map.fitBounds(polyline.getBounds());
+            })
+            .catch(error => console.error('Error fetching tracking data:', error));
+    </script>
+
+</body>
+</html>
