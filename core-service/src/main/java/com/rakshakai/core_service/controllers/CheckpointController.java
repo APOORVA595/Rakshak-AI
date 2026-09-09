@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rakshakai.core_service.models.Tourist;
 import com.rakshakai.core_service.models.TrackingHistory;
 import com.rakshakai.core_service.repositories.TouristRepository;
 import com.rakshakai.core_service.repositories.TrackingHistoryRepository;
+import com.rakshakai.core_service.services.EmailService;
 
 @RestController
 @RequestMapping("/api/checkpoints")
@@ -26,52 +28,79 @@ public class CheckpointController {
     private TouristRepository touristRepository;
 
     @Autowired
+    private EmailService emailService;
+
+    @Autowired
     private TrackingHistoryRepository trackingRepository;
 
-    // METHOD A: Normal RFID Gate Taps (Last Known Location)
+    // --- GLOBAL DISASTER FLAG ---
+    private boolean isGlobalEvacuationActive = false;
+
+    // METHOD A: Fetch all tourists for the Global Base Camp Dashboard
+    @GetMapping("/tourists")
+    public List<Tourist> getAllTourists() {
+        return touristRepository.findAll();
+    }
+
+    // METHOD B: Normal RFID Gate Taps
     @PostMapping("/scan")
     public Map<String, Object> rfidTap(@RequestBody Map<String, String> tapData) {
         String touristId = tapData.get("touristId");
         String location = tapData.get("location");
-
         Map<String, Object> response = new HashMap<>();
         response.put("status", "ACCESS GRANTED");
         response.put("message", "Tourist " + touristId + " passed through " + location);
-        response.put("timestamp", System.currentTimeMillis());
         return response;
     }
 
-    // METHOD B: Active LoRaWAN / GPS Pings (Emergency Tracking)
+    // METHOD C: Active LoRaWAN / GPS Pings (Emergency Tracking)
     @PostMapping("/emergency")
     public Map<String, Object> emergencyPing(@RequestBody Map<String, String> pingData) {
         String touristId = pingData.get("touristId");
         String lat = pingData.get("latitude");
         String lon = pingData.get("longitude");
         String heartRate = pingData.getOrDefault("heartRate", "UNKNOWN");
+        
+        Double aiRiskScore = pingData.containsKey("aiRiskScore") ? Double.parseDouble(pingData.get("aiRiskScore")) : 0.0;
+        Boolean isAnomaly = pingData.containsKey("isAnomaly") ? Boolean.parseBoolean(pingData.get("isAnomaly")) : false;
 
         Map<String, Object> response = new HashMap<>();
 
-        // 1. Look up the tourist in the Postgres database
         Optional<Tourist> touristOpt = touristRepository.findById(touristId);
 
         if (touristOpt.isPresent()) {
             Tourist tourist = touristOpt.get();
             
-            // 2. Automatically update their status to SOS_ACTIVE
-            tourist.setStatus("SOS_ACTIVE");
+            // Lock SOS State ONLY if they are currently safe (TRACKING_ACTIVE).
+            // This stops automated background AI pings from overwriting commander choices like DISPATCHED!
+            if (isAnomaly) {
+                if ("TRACKING_ACTIVE".equals(tourist.getStatus())) {
+                    System.out.println("🚨 DEBUG: NEW EMERGENCY! Locking state to SOS_ACTIVE...");
+                    tourist.setStatus("SOS_ACTIVE");
+                    emailService.sendSOSAlert(tourist, lat, lon);
+                } else {
+                    System.out.println("⚠️ DEBUG: Target is already in rescue lifecycle (" + tourist.getStatus() + "). Ignoring automated AI override.");
+                }
+            }
+    
             touristRepository.save(tourist);
 
-            // 3. Save this specific GPS ping to the tracking history table
+            // Save History
             TrackingHistory history = new TrackingHistory();
             history.setTourist(tourist);
             history.setLatitude(lat);
             history.setLongitude(lon);
             history.setHeartRate(heartRate);
-            history.setPingType("LORA_SOS");
+            history.setPingType("LORA_PING");
+            history.setAiRiskScore(aiRiskScore);
+            history.setIsAnomaly(isAnomaly);
             trackingRepository.save(history);
 
-            response.put("status", "EMERGENCY_SOS_SAVED");
-            response.put("message", "CRITICAL: Location saved for " + tourist.getFullName() + ". Rescue alerted.");
+            response.put("status", isAnomaly ? "EMERGENCY_ANOMALY_SAVED" : "TRACKING_SAVED");
+            
+            // --- DOWNLINK COMMAND FOR OFFLINE WRISTBANDS ---
+            response.put("evacuate", isGlobalEvacuationActive); 
+
         } else {
             response.put("status", "ERROR");
             response.put("message", "Unregistered wristband ID: " + touristId);
@@ -81,9 +110,44 @@ public class CheckpointController {
         return response;
     }
 
-    // METHOD C: Base Camp Dashboard (Fetch live path for the map)
+    // METHOD D: Base Camp Dashboard (Fetch live path for the map)
     @GetMapping("/history/{touristId}")
     public List<TrackingHistory> getTouristHistory(@PathVariable String touristId) {
         return trackingRepository.findByTouristTouristIdOrderByRecordedAtDesc(touristId);
+    }
+
+    // --- NEW METHOD 1: Update Rescue Lifecycle Status ---
+    @PostMapping("/update-status/{touristId}")
+    public Map<String, Object> updateStatus(@PathVariable String touristId, @RequestParam String status, @RequestParam(required = false) String notes) {
+        Map<String, Object> response = new HashMap<>();
+        Optional<Tourist> touristOpt = touristRepository.findById(touristId);
+
+        if (touristOpt.isPresent()) {
+            Tourist tourist = touristOpt.get();
+            tourist.setStatus(status);
+            
+            // If the rescue team adds medical notes, append them to the profile
+            if (notes != null && !notes.isEmpty()) {
+                String currentNotes = tourist.getMedicalConditions() == null ? "" : tourist.getMedicalConditions();
+                tourist.setMedicalConditions(currentNotes + " | [RESCUE LOG]: " + notes);
+            }
+            
+            touristRepository.save(tourist);
+            response.put("status", "SUCCESS");
+            System.out.println("✅ DEBUG: Commander updated " + tourist.getFullName() + " to " + status);
+        }
+        return response;
+    }
+
+    // --- NEW METHOD 2: Trigger Global Evacuation ---
+    @PostMapping("/evacuate")
+    public Map<String, Object> toggleGlobalEvacuation(@RequestParam boolean active) {
+        this.isGlobalEvacuationActive = active;
+        System.out.println("⚠️ GLOBAL EVACUATION STATUS: " + active);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "SUCCESS");
+        response.put("evacuationActive", active);
+        return response;
     }
 }

@@ -28,24 +28,35 @@ public class TrackingHistory {
     private String heartRate;
     private String pingType;
     
+    // --- New AI Fields ---
+    @Column(name = "ai_risk_score")
+    private Double aiRiskScore;
+    
+    @Column(name = "is_anomaly")
+    private Boolean isAnomaly;
+
     @Column(name = "recorded_at", insertable = false, updatable = false)
     private LocalDateTime recordedAt;
 
-    // --- GETTERS (Required for JSON conversion) ---
+    // --- GETTERS ---
     public Long getId() { return id; }
     public Tourist getTourist() { return tourist; }
     public String getLatitude() { return latitude; }
     public String getLongitude() { return longitude; }
     public String getHeartRate() { return heartRate; }
     public String getPingType() { return pingType; }
+    public Double getAiRiskScore() { return aiRiskScore; }
+    public Boolean getIsAnomaly() { return isAnomaly; }
     public LocalDateTime getRecordedAt() { return recordedAt; }
 
-    // --- SETTERS (Required for saving to Database) ---
+    // --- SETTERS ---
     public void setId(Long id) { this.id = id; }
     public void setTourist(Tourist tourist) { this.tourist = tourist; }
     public void setLatitude(String latitude) { this.latitude = latitude; }
     public void setLongitude(String longitude) { this.longitude = longitude; }
     public void setHeartRate(String heartRate) { this.heartRate = heartRate; }
     public void setPingType(String pingType) { this.pingType = pingType; }
+    public void setAiRiskScore(Double aiRiskScore) { this.aiRiskScore = aiRiskScore; }
+    public void setIsAnomaly(Boolean isAnomaly) { this.isAnomaly = isAnomaly; }
     public void setRecordedAt(LocalDateTime recordedAt) { this.recordedAt = recordedAt; }
 }
