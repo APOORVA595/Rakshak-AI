@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: rakshak-postgres
+    environment:
+      POSTGRES_DB: rakshak_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: apoorva
+    ports:
+      - "5433:5432"
+    volumes:
+      - rakshak-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  core-service:
+    build: ./core-service
+    container_name: rakshak-core
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: rakshak_db
+      DB_USERNAME: postgres
+      DB_PASSWORD: apoorva
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep UP || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  ai-service:
+    build: ./ai-service
+    container_name: rakshak-simulator
+    depends_on:
+      core-service:
+        condition: service_healthy
+    environment:
+      BACKEND_HOST: core-service
+
+volumes:
+  rakshak-db-data:

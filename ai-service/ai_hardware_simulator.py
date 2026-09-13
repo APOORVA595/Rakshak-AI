@@ -1,12 +1,16 @@
 import threading
 import time
 import random
+import os
 import requests
 import numpy as np
 from sklearn.ensemble import IsolationForest
 
-API_URL = "http://localhost:8080/api/checkpoints/emergency"
-TOURISTS_API = "http://localhost:8080/api/checkpoints/tourists"
+# Reads BACKEND_HOST from the environment if set (e.g. "core-service" inside Docker),
+# otherwise falls back to "localhost" so this still runs exactly as before outside Docker.
+BACKEND_HOST = os.environ.get("BACKEND_HOST", "localhost")
+API_URL = f"http://{BACKEND_HOST}:8080/api/checkpoints/emergency"
+TOURISTS_API = f"http://{BACKEND_HOST}:8080/api/checkpoints/tourists"
 
 def simulate_tourist(tourist_id, start_lat, start_lon):
     # Initialize a local Isolation Forest model for this device
@@ -71,7 +75,7 @@ def simulate_tourist(tourist_id, start_lat, start_lon):
             
         time.sleep(1.5)
 
-if __name__ == == "__main__":
+if __name__ == "__main__":
     print("Fetching registered personnel from Base Camp backend...")
     try:
         response = requests.get(TOURISTS_API)
