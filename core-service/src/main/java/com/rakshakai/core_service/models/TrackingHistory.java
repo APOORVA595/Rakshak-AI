@@ -35,7 +35,7 @@ public class TrackingHistory {
     @Column(name = "is_anomaly")
     private Boolean isAnomaly;
 
-    @Column(name = "recorded_at", insertable = false, updatable = false)
+    @Column(name = "recorded_at")
     private LocalDateTime recordedAt;
 
     // --- GETTERS ---

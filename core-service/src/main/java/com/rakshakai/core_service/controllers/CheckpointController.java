@@ -94,6 +94,7 @@ public class CheckpointController {
             history.setPingType("LORA_PING");
             history.setAiRiskScore(aiRiskScore);
             history.setIsAnomaly(isAnomaly);
+            history.setRecordedAt(java.time.LocalDateTime.now());
             trackingRepository.save(history);
 
             response.put("status", isAnomaly ? "EMERGENCY_ANOMALY_SAVED" : "TRACKING_SAVED");
