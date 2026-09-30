@@ -18,6 +18,10 @@ public class Tourist {
     private String emergencyContact;
     private String medicalConditions;
     private String status;
+    private String lastKnownLocation;
+
+    @Column(columnDefinition = "TEXT")
+    private String faceVector;
 
     // Getters and Setters
     public String getTouristId() { return touristId; }
@@ -37,4 +41,10 @@ public class Tourist {
     
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getLastKnownLocation() { return lastKnownLocation; }
+    public void setLastKnownLocation(String lastKnownLocation) { this.lastKnownLocation = lastKnownLocation; }
+
+    public String getFaceVector() { return faceVector; }
+    public void setFaceVector(String faceVector) { this.faceVector = faceVector; }
 }

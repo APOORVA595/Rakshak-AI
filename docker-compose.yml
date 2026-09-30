@@ -1,4 +1,4 @@
-services:
+﻿services:
   postgres:
     image: postgres:16
     container_name: rakshak-postgres
@@ -47,6 +47,15 @@ services:
         condition: service_healthy
     environment:
       BACKEND_HOST: core-service
+
+  face-service:
+    build: ./face-service
+    container_name: rakshak-face
+    depends_on:
+      core-service:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
 
 volumes:
   rakshak-db-data:

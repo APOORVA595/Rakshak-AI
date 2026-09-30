@@ -48,8 +48,21 @@ public class CheckpointController {
         String touristId = tapData.get("touristId");
         String location = tapData.get("location");
         Map<String, Object> response = new HashMap<>();
-        response.put("status", "ACCESS GRANTED");
-        response.put("message", "Tourist " + touristId + " passed through " + location);
+
+        Optional<Tourist> touristOpt = touristRepository.findById(touristId);
+
+        if (touristOpt.isPresent()) {
+            Tourist tourist = touristOpt.get();
+            tourist.setLastKnownLocation(location);
+            touristRepository.save(tourist);
+
+            response.put("status", "ACCESS GRANTED");
+            response.put("message", "Tourist " + touristId + " passed through " + location);
+        } else {
+            response.put("status", "ERROR");
+            response.put("message", "Unregistered wristband ID: " + touristId);
+        }
+
         return response;
     }
 
