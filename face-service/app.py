@@ -170,5 +170,54 @@ def identify_face():
         "distance": round(best_distance, 4)
     })
 
+# --- Live camera test page (open http://localhost:5000 in the browser) ---
+LIVE_TEST_HTML = """
+<!DOCTYPE html>
+<html>
+<head><title>Rakshak AI - Live Face Test</title></head>
+<body style="font-family:Arial;max-width:700px;margin:20px auto;">
+  <h2>Rakshak AI - Live Face Test</h2>
+  <video id="video" width="400" autoplay playsinline style="border:1px solid #888;"></video>
+  <p>
+    Tourist ID: <input id="tid" value="tourist_001">
+    <button onclick="registerFace()">Register my face</button>
+  </p>
+  <p>
+    <button onclick="verifyFace()">Verify (check against this ID)</button>
+    <button onclick="identifyFace()">Identify (who is this?)</button>
+  </p>
+  <pre id="out" style="background:#eee;padding:10px;">Result will show here</pre>
+  <script>
+    const video = document.getElementById('video');
+    navigator.mediaDevices.getUserMedia({video: true}).then(s => video.srcObject = s);
+
+    function capture() {
+      const c = document.createElement('canvas');
+      c.width = video.videoWidth;
+      c.height = video.videoHeight;
+      c.getContext('2d').drawImage(video, 0, 0);
+      return c.toDataURL('image/jpeg', 0.9).split(',')[1];
+    }
+    async function call(path, body) {
+      document.getElementById('out').textContent = 'Working...';
+      const r = await fetch(path, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+      });
+      document.getElementById('out').textContent = JSON.stringify(await r.json(), null, 2);
+    }
+    function registerFace() { call('/api/face/register', {touristId: document.getElementById('tid').value, image: capture()}); }
+    function verifyFace() { call('/api/face/verify', {touristId: document.getElementById('tid').value, image: capture()}); }
+    function identifyFace() { call('/api/face/identify', {image: capture()}); }
+  </script>
+</body>
+</html>
+"""
+
+@app.route("/")
+def live_test_page():
+    return LIVE_TEST_HTML
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
