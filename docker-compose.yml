@@ -57,5 +57,14 @@
     ports:
       - "5000:5000"
 
+  rag-service:
+    build: ./rag-service
+    container_name: rakshak-rag
+    depends_on:
+      core-service:
+        condition: service_healthy
+    ports:
+      - "5001:5001"
+
 volumes:
   rakshak-db-data:
